@@ -6,6 +6,6 @@ import java.util.Optional;
 
 
 public interface ApplicationWorkflowRepository extends JpaRepository<ApplicationWorkFlow, Long> {
-    Optional<ApplicationWorkFlow> findByEmployeeIdAndApplicationType(Long employeeId, String applicationType);
+    Optional<ApplicationWorkFlow> findByEmployeeId(Long employeeId);
 }
 

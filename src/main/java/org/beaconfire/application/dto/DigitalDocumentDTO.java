@@ -1,5 +1,6 @@
 package org.beaconfire.application.dto;
 
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 
