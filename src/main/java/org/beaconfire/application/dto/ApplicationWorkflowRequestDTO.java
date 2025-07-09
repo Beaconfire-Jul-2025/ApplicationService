@@ -8,11 +8,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RequiredDocumentDTO {
+public class ApplicationWorkflowRequestDTO {
+
+    @NotNull
+    private Long employeeId;
 
     @NotBlank
-    private String documentType;
+    private String applicationType;
 
     @NotBlank
-    private String s3Url;
+    private String status;
 }
