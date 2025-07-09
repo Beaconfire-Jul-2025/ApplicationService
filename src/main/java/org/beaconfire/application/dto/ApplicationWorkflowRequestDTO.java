@@ -18,4 +18,6 @@ public class ApplicationWorkflowRequestDTO {
 
     @NotBlank
     private String status;
+
+    private String comment;
 }

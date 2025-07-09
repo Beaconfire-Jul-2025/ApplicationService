@@ -27,6 +27,8 @@ public class ApplicationWorkFlow {
     @Column(nullable = false)
     private String status;
 
+    private String comment;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
