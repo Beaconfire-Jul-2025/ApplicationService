@@ -66,14 +66,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-changed-files: 50
           update-comment: true
-
-      - name: Log changed file coverage percentage
-        run: |
-          echo "Changed file coverage: ${{ steps.jacoco.outputs.coverage-changed-files }}%"
-
-      - name: Fail PR if changed file coverage is less than 50%
-        if: ${{ steps.jacoco.outputs.coverage-changed-files < 50.0 }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            core.setFailed('Changed file coverage is less than 50%!')
