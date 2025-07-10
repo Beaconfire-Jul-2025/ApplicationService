@@ -5,6 +5,7 @@ import org.beaconfire.application.entity.ApplicationWorkFlow;
 import org.beaconfire.application.repository.ApplicationWorkflowRepository;
 import org.beaconfire.application.service.ApplicationWorkflowService;
 import org.beaconfire.application.exception.ApplicationAlreadyExistsException;
+import org.beaconfire.application.exception.ApplicationNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,5 +53,15 @@ public class ApplicationWorkflowServiceImpl implements ApplicationWorkflowServic
     @Override
     public List<ApplicationWorkFlow> getApplicationsByStatus(String status) {
         return applicationWorkflowRepository.findByStatus(status);
+    }
+
+    @Override
+    public void updateApplicationStatus(Long applicationId, String status, String comment) {
+        ApplicationWorkFlow app = applicationWorkflowRepository.findById(applicationId)
+            .orElseThrow(() -> new ApplicationNotFoundException(applicationId));
+
+        app.setStatus(status);
+        app.setComment(comment);
+        applicationWorkflowRepository.save(app);
     }
 }

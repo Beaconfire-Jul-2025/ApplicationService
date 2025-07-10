@@ -1,15 +1,15 @@
 package org.beaconfire.application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.beaconfire.application.dto.ApplicationWorkflowRequestDTO;
+import org.beaconfire.application.dto.*;
 import org.beaconfire.application.entity.ApplicationWorkFlow;
-import org.beaconfire.application.exception.ApplicationAlreadyExistsException;
+import org.beaconfire.application.exception.*;
 import org.beaconfire.application.service.ApplicationWorkflowService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,8 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
@@ -151,5 +150,60 @@ class ApplicationWorkflowControllerTest {
         mockMvc.perform(get("/application/pending"))
             .andExpect(status().isOk())
             .andExpect(content().json("[]"));
+    }
+
+    // Success: Updated
+    @Test
+    void updateApplication_shouldReturn200_whenValidRequest() throws Exception {
+        Long id = 1L;
+        ApplicationStatusUpdateDTO dto = ApplicationStatusUpdateDTO.builder()
+            .status("Complete")
+            .comment("Approved by HR")
+            .build();
+
+        mockMvc.perform(put("/application/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message").value("Application updated"));
+
+        verify(applicationWorkflowService).updateApplicationStatus(id, "Complete", "Approved by HR");
+    }
+
+    // Failure: Invalid Status
+    @Test
+    void updateApplication_shouldReturn400_whenStatusInvalid() throws Exception {
+        Long id = 1L;
+        ApplicationStatusUpdateDTO dto = ApplicationStatusUpdateDTO.builder()
+            .status("APPROVED") // ❌ 不合法
+            .comment("Not allowed status")
+            .build();
+
+        mockMvc.perform(put("/application/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("Status must be 'Complete' or 'Rejected'"));
+
+        verify(applicationWorkflowService, never()).updateApplicationStatus(any(), any(), any());
+    }
+
+    // Failure: Application ID not found
+    @Test
+    void updateApplication_shouldReturn404_whenApplicationNotFound() throws Exception {
+        Long id = 999L;
+        ApplicationStatusUpdateDTO dto = ApplicationStatusUpdateDTO.builder()
+            .status("Rejected")
+            .comment("Not eligible")
+            .build();
+
+        doThrow(new ApplicationNotFoundException(id))
+            .when(applicationWorkflowService).updateApplicationStatus(id, "Rejected", "Not eligible");
+
+        mockMvc.perform(put("/application/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message").value("Application not found with id: 999"));
     }
 }
