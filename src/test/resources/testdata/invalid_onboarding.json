@@ -1,0 +1,15 @@
+{
+  "userId": "user_auth_123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@company.com",
+  "cellPhone": "555-123-4567",
+  "ssn": "123-45-6789",
+  "dob": "1990-05-15",
+  "startDate": "2024-01-15",
+  "driverLicense": {
+    "licenseNumber": "DL123456789",
+    "expirationDate": "2028-05-15"
+  }
+  // missing: id, applicationType, personalDocument, emergencyContact, currentAddress, visaStatus
+}

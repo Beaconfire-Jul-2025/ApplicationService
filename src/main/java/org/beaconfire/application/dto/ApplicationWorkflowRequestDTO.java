@@ -11,7 +11,7 @@ import lombok.*;
 public class ApplicationWorkflowRequestDTO {
 
     @NotNull
-    private Long employeeId;
+    private String employeeId;
 
     @NotBlank
     private String applicationType;
