@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.Builder;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -46,5 +47,10 @@ public class ApplicationWorkflowServiceImpl implements ApplicationWorkflowServic
     @Override
     public Optional<ApplicationWorkFlow> findByEmployeeId(String employeeId) {
         return applicationWorkflowRepository.findByEmployeeId(employeeId);
+    }
+
+    @Override
+    public List<ApplicationWorkFlow> getApplicationsByStatus(String status) {
+        return applicationWorkflowRepository.findByStatus(status);
     }
 }

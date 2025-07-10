@@ -8,7 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
+import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -147,5 +150,45 @@ class ApplicationWorkflowServiceImplTest {
         });
 
         assertEquals("Application already exists for employee: EMP001", ex.getMessage());
+    }
+
+    // Success: found Application List
+    @Test
+    void getApplicationsByStatus_shouldReturnList_whenFound() {
+        List<ApplicationWorkFlow> pendingList = Arrays.asList(
+                ApplicationWorkFlow.builder()
+                .id(1L)
+                .employeeId("EMP001")
+                .applicationType("Onboarding")
+                .status("Pending")
+                .build(),
+                ApplicationWorkFlow.builder()
+                .id(2L)
+                .employeeId("EMP002")
+                .applicationType("StatusChange")
+                .status("Pending")
+                .build()
+                );
+
+        when(applicationWorkflowRepository.findByStatus("Pending"))
+            .thenReturn(pendingList);
+
+        List<ApplicationWorkFlow> result = applicationWorkflowService.getApplicationsByStatus("Pending");
+
+        assertEquals(2, result.size());
+        assertEquals("EMP001", result.get(0).getEmployeeId());
+        assertEquals("Pending", result.get(0).getStatus());
+    }
+
+    // Success: found empty Application List
+    @Test
+    void getApplicationsByStatus_shouldReturnEmptyList_whenNoneFound() {
+        when(applicationWorkflowRepository.findByStatus("Approved"))
+            .thenReturn(Collections.emptyList());
+
+        List<ApplicationWorkFlow> result = applicationWorkflowService.getApplicationsByStatus("Approved");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }
