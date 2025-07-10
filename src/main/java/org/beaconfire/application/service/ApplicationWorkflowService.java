@@ -11,4 +11,5 @@ public interface ApplicationWorkflowService {
     ApplicationWorkFlow createApplicationWorkflow(ApplicationWorkflowRequestDTO requestDTO);
     Optional<ApplicationWorkFlow> findByEmployeeId(String employeeId);
     List<ApplicationWorkFlow> getApplicationsByStatus(String status);
+    void updateApplicationStatus(Long applicationId, String status, String comment);
 }

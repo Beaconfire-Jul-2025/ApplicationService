@@ -1,6 +1,7 @@
 package org.beaconfire.application.controller;
 
 import org.beaconfire.application.dto.ApplicationWorkflowRequestDTO;
+import org.beaconfire.application.dto.ApplicationStatusUpdateDTO;
 import org.beaconfire.application.entity.ApplicationWorkFlow;
 import org.beaconfire.application.service.ApplicationWorkflowService;
 import org.beaconfire.application.exception.ApplicationAlreadyExistsException;
@@ -53,5 +54,15 @@ public class ApplicationWorkflowController {
     public ResponseEntity<List<ApplicationWorkFlow>> getPendingApplications() {
         List<ApplicationWorkFlow> result = applicationWorkflowService.getApplicationsByStatus("Pending");
         return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/{applicationId}")
+    public ResponseEntity<Map<String, String>> updateStatus(@PathVariable Long applicationId,
+            @Valid @RequestBody ApplicationStatusUpdateDTO updateDTO) {
+        applicationWorkflowService.updateApplicationStatus(applicationId, updateDTO.getStatus(), updateDTO.getComment());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Application updated");
+        return ResponseEntity.ok(response);
     }
 }
