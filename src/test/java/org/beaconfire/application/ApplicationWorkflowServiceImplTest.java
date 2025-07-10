@@ -3,7 +3,7 @@ package org.beaconfire.application.service.impl;
 import org.beaconfire.application.dto.ApplicationWorkflowRequestDTO;
 import org.beaconfire.application.entity.ApplicationWorkFlow;
 import org.beaconfire.application.repository.ApplicationWorkflowRepository;
-import org.beaconfire.application.exception.ApplicationAlreadyExistsException;
+import org.beaconfire.application.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -190,5 +190,40 @@ class ApplicationWorkflowServiceImplTest {
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
+    }
+
+    // Success: update application status
+    @Test
+    void updateApplicationStatus_shouldUpdateSuccessfully() {
+        Long id = 1L;
+        ApplicationWorkFlow existingApp = ApplicationWorkFlow.builder()
+            .id(id)
+            .employeeId("EMP001")
+            .applicationType("Onboarding")
+            .status("Pending")
+            .comment(null)
+            .build();
+
+        when(applicationWorkflowRepository.findById(id)).thenReturn(Optional.of(existingApp));
+
+        applicationWorkflowService.updateApplicationStatus(id, "Complete", "Approved by HR");
+
+        assertEquals("Complete", existingApp.getStatus());
+        assertEquals("Approved by HR", existingApp.getComment());
+        verify(applicationWorkflowRepository, times(1)).save(existingApp);
+    }
+
+    // Failure: Wrong application ID
+    @Test
+    void updateApplicationStatus_shouldThrowException_whenApplicationNotFound() {
+        Long id = 999L;
+
+        when(applicationWorkflowRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(ApplicationNotFoundException.class, () -> {
+            applicationWorkflowService.updateApplicationStatus(id, "Rejected", "Not eligible");
+        });
+
+        verify(applicationWorkflowRepository, never()).save(any());
     }
 }

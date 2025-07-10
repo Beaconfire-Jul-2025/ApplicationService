@@ -5,6 +5,7 @@ import lombok.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,4 +18,3 @@ public class ApplicationStatusUpdateDTO {
 
     private String comment;
 }
-
