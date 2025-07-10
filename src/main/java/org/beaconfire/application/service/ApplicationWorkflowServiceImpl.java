@@ -1,4 +1,3 @@
-
 package org.beaconfire.application.service.impl;
 
 import org.beaconfire.application.dto.ApplicationWorkflowRequestDTO;
