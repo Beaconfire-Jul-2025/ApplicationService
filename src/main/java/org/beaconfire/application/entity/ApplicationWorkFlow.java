@@ -19,7 +19,7 @@ public class ApplicationWorkFlow {
 
     // FK to Employee, ID
     @Column(nullable = false)
-    private Long employeeId;
+    private String employeeId;
 
     @Column(nullable = false)
     private String applicationType;
