@@ -19,7 +19,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 
 
 @WebMvcTest(ApplicationWorkflowController.class)
@@ -107,5 +112,44 @@ class ApplicationWorkflowControllerTest {
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.applicationType").exists());
+    }
+
+    // Success: Application List
+    @Test
+    void getPendingApplications_shouldReturnList_whenPendingExists() throws Exception {
+        List<ApplicationWorkFlow> pendingList = Arrays.asList(
+                ApplicationWorkFlow.builder()
+                .id(1L)
+                .employeeId("EMP001")
+                .applicationType("Onboarding")
+                .status("Pending")
+                .build(),
+                ApplicationWorkFlow.builder()
+                .id(2L)
+                .employeeId("EMP002")
+                .applicationType("StatusChange")
+                .status("Pending")
+                .build()
+                );
+
+        when(applicationWorkflowService.getApplicationsByStatus("Pending"))
+            .thenReturn(pendingList);
+
+        mockMvc.perform(get("/application/pending"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].employeeId").value("EMP001"))
+            .andExpect(jsonPath("$[1].employeeId").value("EMP002"));
+    }
+
+    // Success: empty List
+    @Test
+    void getPendingApplications_shouldReturnEmptyList_whenNoPending() throws Exception {
+        when(applicationWorkflowService.getApplicationsByStatus("Pending"))
+            .thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/application/pending"))
+            .andExpect(status().isOk())
+            .andExpect(content().json("[]"));
     }
 }

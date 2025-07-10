@@ -48,4 +48,10 @@ public class ApplicationWorkflowController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<ApplicationWorkFlow>> getPendingApplications() {
+        List<ApplicationWorkFlow> result = applicationWorkflowService.getApplicationsByStatus("Pending");
+        return ResponseEntity.ok(result);
+    }
 }
