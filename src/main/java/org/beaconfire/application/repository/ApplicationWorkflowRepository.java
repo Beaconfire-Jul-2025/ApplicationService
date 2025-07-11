@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface ApplicationWorkflowRepository extends JpaRepository<ApplicationWorkFlow, Long> {
     Optional<ApplicationWorkFlow> findByEmployeeId(String employeeId);
     List<ApplicationWorkFlow> findByStatus(String status);
+    Optional<ApplicationWorkFlow> findById(Long id);
 }
-
