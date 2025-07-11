@@ -157,7 +157,7 @@ class ApplicationWorkflowControllerTest {
     void updateApplication_shouldReturn200_whenValidRequest() throws Exception {
         Long id = 1L;
         ApplicationStatusUpdateDTO dto = ApplicationStatusUpdateDTO.builder()
-            .status("Complete")
+            .status("COMPLETED")
             .comment("Approved by HR")
             .build();
 
@@ -167,7 +167,7 @@ class ApplicationWorkflowControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.message").value("Application updated"));
 
-        verify(applicationWorkflowService).updateApplicationStatus(id, "Complete", "Approved by HR");
+        verify(applicationWorkflowService).updateApplicationStatus(id, "COMPLETED", "Approved by HR");
     }
 
     // Failure: Invalid Status
@@ -175,7 +175,7 @@ class ApplicationWorkflowControllerTest {
     void updateApplication_shouldReturn400_whenStatusInvalid() throws Exception {
         Long id = 1L;
         ApplicationStatusUpdateDTO dto = ApplicationStatusUpdateDTO.builder()
-            .status("APPROVED") // ❌ 不合法
+            .status("APPROVED")
             .comment("Not allowed status")
             .build();
 
@@ -183,7 +183,7 @@ class ApplicationWorkflowControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message").value("Status must be 'Complete' or 'Rejected'"));
+            .andExpect(jsonPath("$.message").value("Status error"));
 
         verify(applicationWorkflowService, never()).updateApplicationStatus(any(), any(), any());
     }
@@ -193,12 +193,12 @@ class ApplicationWorkflowControllerTest {
     void updateApplication_shouldReturn404_whenApplicationNotFound() throws Exception {
         Long id = 999L;
         ApplicationStatusUpdateDTO dto = ApplicationStatusUpdateDTO.builder()
-            .status("Rejected")
+            .status("REJECTED")
             .comment("Not eligible")
             .build();
 
         doThrow(new ApplicationNotFoundException(id))
-            .when(applicationWorkflowService).updateApplicationStatus(id, "Rejected", "Not eligible");
+            .when(applicationWorkflowService).updateApplicationStatus(id, "REJECTED", "Not eligible");
 
         mockMvc.perform(put("/application/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
