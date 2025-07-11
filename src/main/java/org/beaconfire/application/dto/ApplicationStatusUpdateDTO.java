@@ -13,7 +13,7 @@ import javax.validation.constraints.Pattern;
 public class ApplicationStatusUpdateDTO {
 
     @NotBlank
-    @Pattern(regexp = "Complete|Rejected", message = "Status must be 'Complete' or 'Rejected'")
+    @Pattern(regexp = "PENDING|IN_PROGRESS|COMPLETED|REJECTED|CANCELLED", message = "Status error")
     private String status;
 
     private String comment;

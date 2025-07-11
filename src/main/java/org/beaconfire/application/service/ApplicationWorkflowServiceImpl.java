@@ -39,7 +39,7 @@ public class ApplicationWorkflowServiceImpl implements ApplicationWorkflowServic
         ApplicationWorkFlow workflow = ApplicationWorkFlow.builder()
             .employeeId(requestDTO.getEmployeeId())
             .applicationType(requestDTO.getApplicationType())
-            .status("Pending")
+            .status("PENDING")
             .build();
 
         return applicationWorkflowRepository.save(workflow);
