@@ -1,6 +1,7 @@
 package org.beaconfire.application.service.impl;
 
 import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
+import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
 import org.beaconfire.application.entity.DigitalDocument;
 import org.beaconfire.application.repository.DigitalDocumentRepository;
 import org.junit.jupiter.api.Test;
@@ -57,5 +58,33 @@ class DigitalDocumentServiceImplTest {
         List<DigitalDocumentResponseDTO> result = service.getAllDocuments();
 
         assertTrue(result.isEmpty());
+    }
+
+    // Success: return document ID
+    @Test
+    void createDocument_shouldSaveAndReturnId() {
+        DigitalDocumentRequestDTO requestDTO = DigitalDocumentRequestDTO.builder()
+                .type("Contract")
+                .title("Employee Handbook")
+                .description("Welcome doc")
+                .required(true)
+                .path("s3://bucket/handbook.pdf")
+                .build();
+
+        DigitalDocument saved = DigitalDocument.builder()
+                .id(100L)
+                .type("Contract")
+                .title("Employee Handbook")
+                .description("Welcome doc")
+                .required(true)
+                .path("s3://bucket/handbook.pdf")
+                .build();
+
+        when(repository.save(any(DigitalDocument.class))).thenReturn(saved);
+
+        Long result = service.createDocument(requestDTO);
+
+        assertEquals(100L, result);
+        verify(repository, times(1)).save(any(DigitalDocument.class));
     }
 }

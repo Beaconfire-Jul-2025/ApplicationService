@@ -1,12 +1,14 @@
 package org.beaconfire.application.controller;
 
 import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
+import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
 import org.beaconfire.application.service.DigitalDocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.Valid;
+import java.util.*;
 
 
 @RestController
@@ -25,5 +27,17 @@ public class DigitalDocumentController {
     public ResponseEntity<List<DigitalDocumentResponseDTO>> getAllDocuments() {
         List<DigitalDocumentResponseDTO> documents = digitalDocumentService.getAllDocuments();
         return ResponseEntity.ok(documents);
+    }
+
+    // Create new document
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> createDocument(@Valid @RequestBody DigitalDocumentRequestDTO requestDTO) {
+        Long docId = digitalDocumentService.createDocument(requestDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("documentId", docId);
+        response.put("message", "Document created successfully");
+
+        return ResponseEntity.status(201).body(response);
     }
 }
