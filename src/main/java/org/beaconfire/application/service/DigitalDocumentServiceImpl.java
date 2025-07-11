@@ -1,6 +1,7 @@
 package org.beaconfire.application.service.impl;
 
 import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
+import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
 import org.beaconfire.application.entity.DigitalDocument;
 import org.beaconfire.application.repository.DigitalDocumentRepository;
 import org.beaconfire.application.service.DigitalDocumentService;
@@ -36,5 +37,19 @@ public class DigitalDocumentServiceImpl implements DigitalDocumentService {
                         .path(doc.getPath())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Long createDocument(DigitalDocumentRequestDTO requestDTO) {
+        DigitalDocument document = DigitalDocument.builder()
+            .type(requestDTO.getType())
+            .title(requestDTO.getTitle())
+            .description(requestDTO.getDescription())
+            .required(requestDTO.isRequired())
+            .path(requestDTO.getPath())
+            .build();
+
+        DigitalDocument saved = documentRepository.save(document);
+        return saved.getId();
     }
 }
