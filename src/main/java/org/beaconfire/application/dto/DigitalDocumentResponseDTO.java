@@ -8,20 +8,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DigitalDocumentDTO {
-
-    @NotBlank
+public class DigitalDocumentResponseDTO {
+    private Long id;
     private String title;
-
-    @NotBlank
     private String type;
-
-    @NotBlank
     private String path;
-
     private String description;
+    private boolean required;
 
-    @NotNull
-    private Boolean isRequired;
 }
-

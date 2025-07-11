@@ -22,10 +22,11 @@ public class DigitalDocument {
     @Column(nullable = false)
     private String type;
 
+    @Column(nullable = false)
     private String path;
 
     private String description;
 
-    @Column(nullable = false)
-    private Boolean isRequired;
+    @Column(name = "isRequired", nullable = false)
+    private boolean required;
 }
