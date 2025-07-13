@@ -4,14 +4,13 @@ import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
 import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
 import org.beaconfire.application.entity.DigitalDocument;
 import org.beaconfire.application.repository.DigitalDocumentRepository;
+import org.beaconfire.application.exception.DocumentNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -86,5 +85,37 @@ class DigitalDocumentServiceImplTest {
 
         assertEquals(100L, result);
         verify(repository, times(1)).save(any(DigitalDocument.class));
+    }
+
+    // Success: return single document
+    @Test
+    void getDocumentById_shouldReturnDTO_whenFound() {
+        DigitalDocument doc = DigitalDocument.builder()
+                .id(1L)
+                .type("Contract")
+                .title("Title A")
+                .description("Desc A")
+                .required(true)
+                .path("s3://doc.pdf")
+                .build();
+
+        when(repository.findById(1L)).thenReturn(Optional.of(doc));
+
+        DigitalDocumentResponseDTO result = service.getDocumentById(1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals("Contract", result.getType());
+        assertTrue(result.isRequired());
+    }
+
+    // Failure: throw exception
+    @Test
+    void getDocumentById_shouldThrow_whenNotFound() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(DocumentNotFoundException.class, () -> {
+            service.getDocumentById(999L);
+        });
     }
 }
