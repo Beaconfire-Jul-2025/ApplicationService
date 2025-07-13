@@ -1,8 +1,6 @@
 package org.beaconfire.application.service;
 
-import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
-import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
-import org.beaconfire.application.dto.DigitalDocumentUpdateDTO;
+import org.beaconfire.application.dto.*;
 
 import java.util.List;
 
@@ -12,4 +10,5 @@ public interface DigitalDocumentService {
     Long createDocument(DigitalDocumentRequestDTO requestDTO);
     DigitalDocumentResponseDTO getDocumentById(Long id);
     void updateDocument(Long documentId, DigitalDocumentUpdateDTO updateDTO);
+    void updateDocumentFilePath(Long documentId, DigitalDocumentFileUpdateDTO dto);
 }

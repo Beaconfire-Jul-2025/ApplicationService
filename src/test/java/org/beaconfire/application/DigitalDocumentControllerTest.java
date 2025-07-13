@@ -182,4 +182,49 @@ public class DigitalDocumentControllerTest {
             .andExpect(jsonPath("$.message", is("Document not found with id: 999")));
     }
 
+    // Success: return 200
+    @Test
+    void updateDocumentFile_shouldReturn200_whenValid() throws Exception {
+        DigitalDocumentFileUpdateDTO dto = DigitalDocumentFileUpdateDTO.builder()
+            .path("s3://updated/path.pdf")
+            .build();
+
+        doNothing().when(documentService).updateDocumentFilePath(eq(1L), any());
+
+        mockMvc.perform(put("/document/1/file")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message").value("Document file path updated successfully"));
+    }
+
+    // Failure: blank path
+    @Test
+    void updateDocumentFile_shouldReturn400_whenPathIsBlank() throws Exception {
+        DigitalDocumentFileUpdateDTO dto = DigitalDocumentFileUpdateDTO.builder()
+            .path("")  // invalid
+            .build();
+
+        mockMvc.perform(put("/document/1/file")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isBadRequest());
+    }
+
+    // Failure: document not found
+    @Test
+    void updateDocumentFile_shouldReturn404_whenDocumentNotFound() throws Exception {
+        DigitalDocumentFileUpdateDTO dto = DigitalDocumentFileUpdateDTO.builder()
+            .path("s3://missing/path.pdf")
+            .build();
+
+        doThrow(new DocumentNotFoundException(99L))
+            .when(documentService).updateDocumentFilePath(eq(99L), any());
+
+        mockMvc.perform(put("/document/99/file")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isNotFound());
+    }
+
 }
