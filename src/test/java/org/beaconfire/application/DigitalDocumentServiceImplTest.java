@@ -159,4 +159,37 @@ class DigitalDocumentServiceImplTest {
         assertThrows(DocumentNotFoundException.class, () ->
                 service.updateDocument(id, DigitalDocumentUpdateDTO.builder().build()));
     }
+  
+    // Success: update path
+    @Test
+    void updateDocumentFilePath_shouldUpdatePath_whenValid() {
+        DigitalDocument document = DigitalDocument.builder()
+            .id(1L)
+            .path("s3://old/path.pdf")
+            .build();
+
+        when(repository.findById(1L)).thenReturn(Optional.of(document));
+
+        DigitalDocumentFileUpdateDTO dto = DigitalDocumentFileUpdateDTO.builder()
+            .path("s3://new/path.pdf")
+            .build();
+
+        service.updateDocumentFilePath(1L, dto);
+
+        assertEquals("s3://new/path.pdf", document.getPath());
+        verify(repository).save(document);
+    }
+
+    // Failure: document not found
+    @Test
+    void updateDocumentFilePath_shouldThrow_whenDocumentNotFound() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        DigitalDocumentFileUpdateDTO dto = DigitalDocumentFileUpdateDTO.builder()
+            .path("s3://something.pdf")
+            .build();
+
+        assertThrows(DocumentNotFoundException.class, () ->
+                service.updateDocumentFilePath(99L, dto));
+    }
 }

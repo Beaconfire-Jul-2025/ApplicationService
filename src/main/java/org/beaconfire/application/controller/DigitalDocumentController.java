@@ -1,8 +1,6 @@
 package org.beaconfire.application.controller;
 
-import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
-import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
-import org.beaconfire.application.dto.DigitalDocumentUpdateDTO;
+import org.beaconfire.application.dto.*;
 import org.beaconfire.application.service.DigitalDocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -61,4 +59,15 @@ public class DigitalDocumentController {
         return ResponseEntity.ok(response);
     }
 
+    // Update document file path
+    @PutMapping("/{documentId}/file")
+    public ResponseEntity<Map<String, Object>> updateDocumentFile(@PathVariable Long documentId,
+        @Valid @RequestBody DigitalDocumentFileUpdateDTO dto) {
+
+        digitalDocumentService.updateDocumentFilePath(documentId, dto);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Document file path updated successfully");
+        return ResponseEntity.ok(response);
+    }
 }
