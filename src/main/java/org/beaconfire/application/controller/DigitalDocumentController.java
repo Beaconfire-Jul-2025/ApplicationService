@@ -29,6 +29,13 @@ public class DigitalDocumentController {
         return ResponseEntity.ok(documents);
     }
 
+    // Get single document
+    @GetMapping("/{documentId}")
+    public ResponseEntity<DigitalDocumentResponseDTO> getDocumentById(@PathVariable Long documentId) {
+        DigitalDocumentResponseDTO dto = digitalDocumentService.getDocumentById(documentId);
+        return ResponseEntity.ok(dto);
+    }
+
     // Create new document
     @PostMapping
     public ResponseEntity<Map<String, Object>> createDocument(@Valid @RequestBody DigitalDocumentRequestDTO requestDTO) {

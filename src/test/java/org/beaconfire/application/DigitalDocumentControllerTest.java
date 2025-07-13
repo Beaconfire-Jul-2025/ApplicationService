@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
 import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
 import org.beaconfire.application.service.DigitalDocumentService;
+import org.beaconfire.application.exception.DocumentNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -106,5 +107,28 @@ public class DigitalDocumentControllerTest {
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
     }
+
+    // Success: found document
+    @Test
+    void getDocumentById_shouldReturn200_whenFound() throws Exception {
+        when(documentService.getDocumentById(1L)).thenReturn(sampleDoc);
+
+        mockMvc.perform(get("/document/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.type", is("Contract")));
+    }
+
+    // Failure: document not found, return 404
+    @Test
+    void getDocumentById_shouldReturn404_whenNotFound() throws Exception {
+        when(documentService.getDocumentById(99L))
+            .thenThrow(new DocumentNotFoundException(99L));
+
+        mockMvc.perform(get("/document/99"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message", is("Document not found with id: 99")));
+    }
+
 }
 

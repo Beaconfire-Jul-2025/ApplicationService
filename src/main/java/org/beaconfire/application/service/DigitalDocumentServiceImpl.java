@@ -5,6 +5,7 @@ import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
 import org.beaconfire.application.entity.DigitalDocument;
 import org.beaconfire.application.repository.DigitalDocumentRepository;
 import org.beaconfire.application.service.DigitalDocumentService;
+import org.beaconfire.application.exception.DocumentNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +52,20 @@ public class DigitalDocumentServiceImpl implements DigitalDocumentService {
 
         DigitalDocument saved = documentRepository.save(document);
         return saved.getId();
+    }
+
+    @Override
+    public DigitalDocumentResponseDTO getDocumentById(Long id) {
+        DigitalDocument doc = documentRepository.findById(id)
+            .orElseThrow(() -> new DocumentNotFoundException(id));
+
+        return DigitalDocumentResponseDTO.builder()
+            .id(doc.getId())
+            .type(doc.getType())
+            .title(doc.getTitle())
+            .description(doc.getDescription())
+            .required(doc.isRequired())
+            .path(doc.getPath())
+            .build();
     }
 }
