@@ -89,4 +89,12 @@ public class DigitalDocumentServiceImpl implements DigitalDocumentService {
         document.setPath(dto.getPath());
         documentRepository.save(document);
     }
+
+    @Override
+    public void deleteDocument(Long documentId) {
+        DigitalDocument document = documentRepository.findById(documentId)
+            .orElseThrow(() -> new DocumentNotFoundException(documentId));
+
+        documentRepository.delete(document);
+    }
 }

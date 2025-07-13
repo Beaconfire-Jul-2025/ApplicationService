@@ -11,4 +11,5 @@ public interface DigitalDocumentService {
     DigitalDocumentResponseDTO getDocumentById(Long id);
     void updateDocument(Long documentId, DigitalDocumentUpdateDTO updateDTO);
     void updateDocumentFilePath(Long documentId, DigitalDocumentFileUpdateDTO dto);
+    void deleteDocument(Long documentId);
 }

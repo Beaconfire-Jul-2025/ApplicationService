@@ -198,7 +198,7 @@ public class DigitalDocumentControllerTest {
             .andExpect(jsonPath("$.message").value("Document file path updated successfully"));
     }
 
-    // Failure: blank path
+    // Failure: blank path, return 400
     @Test
     void updateDocumentFile_shouldReturn400_whenPathIsBlank() throws Exception {
         DigitalDocumentFileUpdateDTO dto = DigitalDocumentFileUpdateDTO.builder()
@@ -211,7 +211,7 @@ public class DigitalDocumentControllerTest {
             .andExpect(status().isBadRequest());
     }
 
-    // Failure: document not found
+    // Failure: document not found, return 404
     @Test
     void updateDocumentFile_shouldReturn404_whenDocumentNotFound() throws Exception {
         DigitalDocumentFileUpdateDTO dto = DigitalDocumentFileUpdateDTO.builder()
@@ -224,6 +224,26 @@ public class DigitalDocumentControllerTest {
         mockMvc.perform(put("/document/99/file")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isNotFound());
+    }
+
+    // Success: return 200
+    @Test
+    void deleteDocument_shouldReturn200_whenSuccess() throws Exception {
+        doNothing().when(documentService).deleteDocument(1L);
+
+        mockMvc.perform(delete("/document/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message").value("Document deleted successfully"));
+    }
+
+    // Failure: document not found, return 404
+    @Test
+    void deleteDocument_shouldReturn404_whenNotFound() throws Exception {
+        doThrow(new DocumentNotFoundException(999L))
+            .when(documentService).deleteDocument(999L);
+
+        mockMvc.perform(delete("/document/999"))
             .andExpect(status().isNotFound());
     }
 }

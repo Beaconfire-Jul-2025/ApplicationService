@@ -70,4 +70,14 @@ public class DigitalDocumentController {
         response.put("message", "Document file path updated successfully");
         return ResponseEntity.ok(response);
     }
+
+    // Delete exist document
+    @DeleteMapping("/{documentId}")
+    public ResponseEntity<Map<String, Object>> deleteDocument(@PathVariable Long documentId) {
+        digitalDocumentService.deleteDocument(documentId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Document deleted successfully");
+        return ResponseEntity.ok(response);
+    }
 }
