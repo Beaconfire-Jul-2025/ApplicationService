@@ -105,6 +105,28 @@ public class DigitalDocumentControllerTest {
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
     }
+  
+    // Success: found document
+    @Test
+    void getDocumentById_shouldReturn200_whenFound() throws Exception {
+        when(documentService.getDocumentById(1L)).thenReturn(sampleDoc);
+
+        mockMvc.perform(get("/document/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.type", is("Contract")));
+    }
+
+    // Failure: document not found, return 404
+    @Test
+    void getDocumentById_shouldReturn404_whenNotFound() throws Exception {
+        when(documentService.getDocumentById(99L))
+            .thenThrow(new DocumentNotFoundException(99L));
+
+        mockMvc.perform(get("/document/99"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message", is("Document not found with id: 99")));
+    }
 
     // Success: found document
     @Test
