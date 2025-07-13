@@ -159,7 +159,7 @@ class DigitalDocumentServiceImplTest {
         assertThrows(DocumentNotFoundException.class, () ->
                 service.updateDocument(id, DigitalDocumentUpdateDTO.builder().build()));
     }
-
+  
     // Success: update path
     @Test
     void updateDocumentFilePath_shouldUpdatePath_whenValid() {

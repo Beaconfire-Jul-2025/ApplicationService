@@ -226,5 +226,4 @@ public class DigitalDocumentControllerTest {
                 .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isNotFound());
     }
-
 }
