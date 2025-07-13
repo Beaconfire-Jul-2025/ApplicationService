@@ -192,4 +192,30 @@ class DigitalDocumentServiceImplTest {
         assertThrows(DocumentNotFoundException.class, () ->
                 service.updateDocumentFilePath(99L, dto));
     }
+
+    // Success: delete document
+    @Test
+    void deleteDocument_shouldDelete_whenExists() {
+        DigitalDocument document = DigitalDocument.builder()
+            .id(1L)
+            .type("Contract")
+            .build();
+
+        when(repository.findById(1L)).thenReturn(Optional.of(document));
+
+        service.deleteDocument(1L);
+
+        verify(repository).delete(document);
+    }
+
+    // Failure: document not found
+    @Test
+    void deleteDocument_shouldThrow_whenNotFound() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(DocumentNotFoundException.class, () ->
+                service.deleteDocument(999L));
+
+        verify(repository, never()).delete(any());
+    }
 }
