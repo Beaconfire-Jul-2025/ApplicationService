@@ -1,7 +1,6 @@
 package org.beaconfire.application.service.impl;
 
-import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
-import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
+import org.beaconfire.application.dto.*;
 import org.beaconfire.application.entity.DigitalDocument;
 import org.beaconfire.application.repository.DigitalDocumentRepository;
 import org.beaconfire.application.exception.DocumentNotFoundException;
@@ -117,5 +116,47 @@ class DigitalDocumentServiceImplTest {
         assertThrows(DocumentNotFoundException.class, () -> {
             service.getDocumentById(999L);
         });
+    }
+
+    // Success: Update document metadata
+    @Test
+    void updateDocument_shouldUpdateFields_whenDocumentExists() {
+        Long id = 1L;
+        DigitalDocument existing = DigitalDocument.builder()
+            .id(id)
+            .type("OldType")
+            .title("OldTitle")
+            .description("OldDesc")
+            .required(false)
+            .path("s3://old/path")
+            .build();
+
+        DigitalDocumentUpdateDTO updateDTO = DigitalDocumentUpdateDTO.builder()
+            .type("NewType")
+            .title("NewTitle")
+            .description("NewDesc")
+            .required(true)
+            .build();
+
+        when(repository.findById(id)).thenReturn(Optional.of(existing));
+
+        service.updateDocument(id, updateDTO);
+
+        assertEquals("NewType", existing.getType());
+        assertEquals("NewTitle", existing.getTitle());
+        assertEquals("NewDesc", existing.getDescription());
+        assertTrue(existing.isRequired());
+
+        verify(repository).save(existing);
+    }
+
+    // Failure: document not found
+    @Test
+    void updateDocument_shouldThrow_whenDocumentNotFound() {
+        Long id = 999L;
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(DocumentNotFoundException.class, () ->
+                service.updateDocument(id, DigitalDocumentUpdateDTO.builder().build()));
     }
 }

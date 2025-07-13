@@ -2,6 +2,7 @@ package org.beaconfire.application.service.impl;
 
 import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
 import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
+import org.beaconfire.application.dto.DigitalDocumentUpdateDTO;
 import org.beaconfire.application.entity.DigitalDocument;
 import org.beaconfire.application.repository.DigitalDocumentRepository;
 import org.beaconfire.application.service.DigitalDocumentService;
@@ -67,5 +68,18 @@ public class DigitalDocumentServiceImpl implements DigitalDocumentService {
             .required(doc.isRequired())
             .path(doc.getPath())
             .build();
+    }
+
+    @Override
+    public void updateDocument(Long documentId, DigitalDocumentUpdateDTO updateDTO) {
+        DigitalDocument doc = documentRepository.findById(documentId)
+            .orElseThrow(() -> new DocumentNotFoundException(documentId));
+
+        doc.setType(updateDTO.getType());
+        doc.setTitle(updateDTO.getTitle());
+        doc.setDescription(updateDTO.getDescription());
+        doc.setRequired(updateDTO.isRequired());
+
+        documentRepository.save(doc);
     }
 }
