@@ -97,4 +97,11 @@ public class DigitalDocumentServiceImpl implements DigitalDocumentService {
 
         documentRepository.delete(document);
     }
+
+    @Override
+    public String getDocumentPath(Long documentId) {
+        return documentRepository.findById(documentId)
+            .map(DigitalDocument::getPath)
+            .orElseThrow(() -> new DocumentNotFoundException(documentId));
+    }
 }

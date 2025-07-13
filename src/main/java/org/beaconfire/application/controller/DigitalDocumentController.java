@@ -4,10 +4,12 @@ import org.beaconfire.application.dto.*;
 import org.beaconfire.application.service.DigitalDocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.net.URI;
 
 
 @RestController
@@ -79,5 +81,15 @@ public class DigitalDocumentController {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Document deleted successfully");
         return ResponseEntity.ok(response);
+    }
+
+    // Get download url
+    @GetMapping("/{documentId}/download")
+    public ResponseEntity<Void> downloadDocument(@PathVariable Long documentId) {
+        String path = digitalDocumentService.getDocumentPath(documentId);
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+            .location(URI.create(path))
+            .build();
     }
 }

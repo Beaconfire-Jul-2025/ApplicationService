@@ -246,4 +246,26 @@ public class DigitalDocumentControllerTest {
         mockMvc.perform(delete("/document/999"))
             .andExpect(status().isNotFound());
     }
+
+    // Success: return 302 for redirecting
+    @Test
+    void downloadDocument_shouldReturn302_whenFound() throws Exception {
+        String path = "https://s3.amazonaws.com/bucket/doc.pdf";
+
+        when(documentService.getDocumentPath(1L)).thenReturn(path);
+
+        mockMvc.perform(get("/document/1/download"))
+            .andExpect(status().isFound())
+            .andExpect(header().string("Location", path));
+    }
+
+    // Failure: document not found, return 404
+    @Test
+    void downloadDocument_shouldReturn404_whenNotFound() throws Exception {
+        when(documentService.getDocumentPath(999L))
+            .thenThrow(new DocumentNotFoundException(999L));
+
+        mockMvc.perform(get("/document/999/download"))
+            .andExpect(status().isNotFound());
+    }
 }

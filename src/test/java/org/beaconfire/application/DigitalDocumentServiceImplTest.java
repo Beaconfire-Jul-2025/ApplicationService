@@ -218,4 +218,27 @@ class DigitalDocumentServiceImplTest {
 
         verify(repository, never()).delete(any());
     }
+
+    // Success: return path
+    @Test
+    void getDocumentPath_shouldReturnPath_whenFound() {
+        DigitalDocument doc = DigitalDocument.builder()
+            .id(1L)
+            .path("https://s3.amazonaws.com/bucket/doc.pdf")
+            .build();
+
+        when(repository.findById(1L)).thenReturn(Optional.of(doc));
+
+        String result = service.getDocumentPath(1L);
+
+        assertEquals("https://s3.amazonaws.com/bucket/doc.pdf", result);
+    }
+
+    // Failure: document not found
+    @Test
+    void getDocumentPath_shouldThrow_whenNotFound() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(DocumentNotFoundException.class, () -> service.getDocumentPath(999L));
+    }
 }
