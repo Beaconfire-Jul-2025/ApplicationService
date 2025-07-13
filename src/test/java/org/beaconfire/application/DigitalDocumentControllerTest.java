@@ -1,13 +1,11 @@
 package org.beaconfire.application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
-import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
+import org.beaconfire.application.dto.*;
 import org.beaconfire.application.service.DigitalDocumentService;
 import org.beaconfire.application.exception.DocumentNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,7 +18,7 @@ import java.util.Collections;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -130,5 +128,58 @@ public class DigitalDocumentControllerTest {
             .andExpect(jsonPath("$.message", is("Document not found with id: 99")));
     }
 
-}
+    // Success: return 200
+    @Test
+    void updateDocument_shouldReturn200_whenValid() throws Exception {
+        DigitalDocumentUpdateDTO updateDTO = DigitalDocumentUpdateDTO.builder()
+            .type("UpdatedType")
+            .title("UpdatedTitle")
+            .description("Updated Description")
+            .required(true)
+            .build();
 
+        doNothing().when(documentService).updateDocument(eq(1L), any());
+
+        mockMvc.perform(put("/document/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message", is("Document updated successfully")));
+    }
+
+    // Failure: return 400
+    @Test
+    void updateDocument_shouldReturn400_whenMissingFields() throws Exception {
+        DigitalDocumentUpdateDTO invalidDTO = DigitalDocumentUpdateDTO.builder()
+            .type("")
+            .title("")
+            .required(false)
+            .build();
+
+        mockMvc.perform(put("/document/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidDTO)))
+            .andExpect(status().isBadRequest());
+    }
+
+    // Failure: return 404, document not found
+    @Test
+    void updateDocument_shouldReturn404_whenDocumentNotFound() throws Exception {
+        DigitalDocumentUpdateDTO updateDTO = DigitalDocumentUpdateDTO.builder()
+            .type("UpdatedType")
+            .title("UpdatedTitle")
+            .description("Updated Description")
+            .required(true)
+            .build();
+
+        doThrow(new DocumentNotFoundException(999L))
+            .when(documentService).updateDocument(eq(999L), any());
+
+        mockMvc.perform(put("/document/999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO)))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message", is("Document not found with id: 999")));
+    }
+
+}

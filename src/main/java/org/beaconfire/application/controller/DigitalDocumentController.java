@@ -2,6 +2,7 @@ package org.beaconfire.application.controller;
 
 import org.beaconfire.application.dto.DigitalDocumentResponseDTO;
 import org.beaconfire.application.dto.DigitalDocumentRequestDTO;
+import org.beaconfire.application.dto.DigitalDocumentUpdateDTO;
 import org.beaconfire.application.service.DigitalDocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -47,4 +48,17 @@ public class DigitalDocumentController {
 
         return ResponseEntity.status(201).body(response);
     }
+
+    // Update document metadata
+    @PutMapping("/{documentId}")
+    public ResponseEntity<Map<String, Object>> updateDocument(@PathVariable Long documentId,
+        @Valid @RequestBody DigitalDocumentUpdateDTO updateDTO) {
+
+        digitalDocumentService.updateDocument(documentId, updateDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Document updated successfully");
+        return ResponseEntity.ok(response);
+    }
+
 }
