@@ -2,6 +2,7 @@ package org.beaconfire.application.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.beaconfire.application.dto.ApplicationWorkFlowDto;
+import org.beaconfire.application.dto.PageListResponse;
 import org.beaconfire.application.model.ApplicationWorkFlow;
 import org.beaconfire.application.service.ApplicationWorkFlowService;
 import org.springframework.data.domain.Page;
@@ -22,7 +23,7 @@ public class ApplicationWorkFlowController {
     private final ApplicationWorkFlowService service;
 
     @GetMapping
-    public Page<ApplicationWorkFlowDto> getAllWorkFlows(
+    public PageListResponse<ApplicationWorkFlowDto> getAllWorkFlows(
             @RequestParam(required = false) String employeeId,
             @RequestParam(required = false) ApplicationWorkFlow.WorkFlowStatus status,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
@@ -37,7 +38,14 @@ public class ApplicationWorkFlowController {
                 : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return service.getAllWithFilters(employeeId, status, startDate, endDate, pageable);
+        Page<ApplicationWorkFlowDto> workflows = service.getAllWithFilters(employeeId, status, startDate, endDate, pageable);
+
+        return PageListResponse.<ApplicationWorkFlowDto>builder()
+                .list(workflows.getContent())
+                .current(workflows.getNumber() + 1)
+                .pageSize(workflows.getSize())
+                .total(workflows.getTotalElements())
+                .build();
     }
 
     @GetMapping("/{id}")
