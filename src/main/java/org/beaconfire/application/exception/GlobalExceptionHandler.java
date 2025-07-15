@@ -1,70 +1,67 @@
 package org.beaconfire.application.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
+import org.beaconfire.application.dto.ApiResponse;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.InetAddress;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex, WebRequest request) {
+    @Value("${spring.application.name:beaconfire}")
+    private String appName;
 
-        List<String> details = new ArrayList<>();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            details.add(error.getField() + ": " + error.getDefaultMessage());
+    private String traceId() {
+        return MDC.get("traceId");
+    }
+
+    private String host() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            return "unknown";
         }
+    }
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Failed",
-                "Input validation failed",
-                request.getDescription(false),
-                details
-        );
+    private ApiResponse<?> fail(String errorCode, String errorMessage, int showType) {
+        return ApiResponse.builder()
+                .success(false)
+                .errorCode(errorCode)
+                .errorMessage(errorMessage)
+                .showType(showType)
+                .traceId(traceId())
+                .host(host())
+                .build();
+    }
 
-        return ResponseEntity.badRequest().body(errorResponse);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ApiResponse<?> handleValidation(MethodArgumentNotValidException ex) {
+        String msg = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        return fail("400001", msg, 2);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ApiResponse<?> notFound(NoSuchElementException ex) {
+        return fail("404001", ex.getMessage(), 2);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
-            IllegalArgumentException ex, WebRequest request) {
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
-                ex.getMessage(),
-                request.getDescription(false),
-                null
-        );
-
-        return ResponseEntity.badRequest().body(errorResponse);
+    public ApiResponse<?> badRequest(IllegalArgumentException ex) {
+        return fail("400002", ex.getMessage(), 2);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(
-            Exception ex, WebRequest request) {
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                "An unexpected error occurred",
-                request.getDescription(false),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    public ApiResponse<?> other(Exception ex) {
+        return fail("500000", "The system is busy, please try again later", 2);
     }
 }
