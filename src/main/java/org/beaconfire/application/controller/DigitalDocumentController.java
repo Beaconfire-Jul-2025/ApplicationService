@@ -2,6 +2,7 @@ package org.beaconfire.application.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.beaconfire.application.dto.DigitalDocumentDto;
+import org.beaconfire.application.dto.PageListResponse;
 import org.beaconfire.application.service.DigitalDocumentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +22,7 @@ public class DigitalDocumentController {
     private final DigitalDocumentService service;
 
     @GetMapping
-    public Page<DigitalDocumentDto> getAllDocuments(
+    public PageListResponse<DigitalDocumentDto> getAllDocuments(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Boolean isRequired,
             @RequestParam(required = false) String title,
@@ -37,7 +38,14 @@ public class DigitalDocumentController {
                 : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return service.getAllWithFilters(type, isRequired, title, startDate, endDate, pageable);
+        Page<DigitalDocumentDto> documents = service.getAllWithFilters(type, isRequired, title, startDate, endDate, pageable);
+
+        return PageListResponse.<DigitalDocumentDto>builder()
+                .list(documents.getContent())
+                .current(documents.getNumber() + 1)
+                .pageSize(documents.getSize())
+                .total(documents.getTotalElements())
+                .build();
     }
 
     @GetMapping("/{id}")
