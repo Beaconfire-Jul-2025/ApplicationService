@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    username: test
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    root: INFO
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN
+    com.github.dockerjava.zerodep.shaded: ERROR
+    org.apache.hc.client5.http: WARN
+    shaded.org.apache.hc: ERROR
