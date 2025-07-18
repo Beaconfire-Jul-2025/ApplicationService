@@ -32,4 +32,7 @@ public class ApplicationWorkFlowDto {
     private ApplicationWorkFlow.WorkFlowStatus status;
 
     private String comment;
+
+    @NotBlank(message = "Application type is required")
+    private String applicationType;
 }

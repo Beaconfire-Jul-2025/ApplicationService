@@ -26,6 +26,7 @@ public class ApplicationWorkFlowController {
     public PageListResponse<ApplicationWorkFlowDto> getAllWorkFlows(
             @RequestParam(required = false) String employeeId,
             @RequestParam(required = false) ApplicationWorkFlow.WorkFlowStatus status,
+            @RequestParam(required = false) String applicationType,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @RequestParam(defaultValue = "0") int page,
@@ -38,7 +39,7 @@ public class ApplicationWorkFlowController {
                 : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<ApplicationWorkFlowDto> workflows = service.getAllWithFilters(employeeId, status, startDate, endDate, pageable);
+        Page<ApplicationWorkFlowDto> workflows = service.getAllWithFilters(employeeId, status, applicationType, startDate, endDate, pageable);
 
         return PageListResponse.<ApplicationWorkFlowDto>builder()
                 .list(workflows.getContent())

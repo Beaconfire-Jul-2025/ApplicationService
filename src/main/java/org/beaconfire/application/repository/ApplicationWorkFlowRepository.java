@@ -23,10 +23,12 @@ public interface ApplicationWorkFlowRepository extends JpaRepository<Application
     @Query("SELECT aw FROM ApplicationWorkFlow aw WHERE " +
             "(:employeeId IS NULL OR UPPER(aw.employeeId) LIKE UPPER(CONCAT('%', :employeeId, '%'))) AND " +
             "(:status IS NULL OR aw.status = :status) AND " +
+            "(:applicationType IS NULL OR UPPER(aw.applicationType) LIKE UPPER(CONCAT('%', :applicationType, '%'))) AND " +
             "(:startDate IS NULL OR aw.createDate >= :startDate) AND " +
             "(:endDate IS NULL OR aw.createDate <= :endDate)")
     Page<ApplicationWorkFlow> findByFilters(@Param("employeeId") String employeeId,
                                             @Param("status") WorkFlowStatus status,
+                                            @Param("applicationType") String applicationType,
                                             @Param("startDate") LocalDateTime startDate,
                                             @Param("endDate") LocalDateTime endDate,
                                             Pageable pageable);

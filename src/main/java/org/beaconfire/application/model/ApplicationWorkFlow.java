@@ -9,7 +9,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "ApplicationWorkFlow")
@@ -40,6 +39,9 @@ public class ApplicationWorkFlow {
 
     @Column(columnDefinition = "TEXT")
     private String comment;
+
+    @NotBlank(message = "Application type is required")
+    private String applicationType;
 
     @PrePersist
     protected void onCreate() {

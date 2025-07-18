@@ -22,9 +22,9 @@ public class ApplicationWorkFlowService {
     private final ApplicationWorkFlowMapper mapper;
 
     public Page<ApplicationWorkFlowDto> getAllWithFilters(String employeeId, ApplicationWorkFlow.WorkFlowStatus status,
-                                                          LocalDateTime startDate, LocalDateTime endDate,
+                                                          String applicationType, LocalDateTime startDate, LocalDateTime endDate,
                                                           Pageable pageable) {
-        Page<ApplicationWorkFlow> entities = repository.findByFilters(employeeId, status, startDate, endDate, pageable);
+        Page<ApplicationWorkFlow> entities = repository.findByFilters(employeeId, status, applicationType, startDate, endDate, pageable);
         return entities.map(mapper::toDto);
     }
 
@@ -44,6 +44,7 @@ public class ApplicationWorkFlowService {
             existing.setEmployeeId(dto.getEmployeeId());
             existing.setStatus(dto.getStatus());
             existing.setComment(dto.getComment());
+            existing.setApplicationType(dto.getApplicationType());
             ApplicationWorkFlow updated = repository.save(existing);
             return mapper.toDto(updated);
         });
